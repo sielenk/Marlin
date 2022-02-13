@@ -101,6 +101,13 @@
   #define MOTHERBOARD BOARD_CREALITY_V4
 #endif
 
+/* According to
+ * https://www.th3dstudio.com/hc/product-information/3rd-party-control-boards/creality-boards/creality-v4-2-x-board-driver-codes/
+ * my board has HR4988 chips (sharpy mark "C") which is compatible with the configured "A4988".
+ */
+#define EMIT_CREALITY_422_WARNING false
+
+
 /**
  * Select the serial port on the board to use for communication with the host.
  * This allows the connection of wireless adapters (for instance) to non-default port pins.

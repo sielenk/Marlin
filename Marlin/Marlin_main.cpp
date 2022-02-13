@@ -5961,17 +5961,14 @@ void home_all_axes() { gcode_G28(true); }
 /**
  * G92: Set current position to given X Y Z E
  */
-inline void gcode_G92() 
-{
+inline void gcode_G92() {
   bool didXYZ = false,
        didE = parser.seenval('E');
 
   if (!didE) stepper.synchronize();
 
-  LOOP_XYZE(i) 
-  {
-    if (parser.seenval(axis_codes[i])) 
-    {
+  LOOP_XYZE(i) {
+    if (parser.seenval(axis_codes[i])) {
       #if IS_SCARA
         current_position[i] = parser.value_axis_units((AxisEnum)i);
         if (i != E_AXIS) didXYZ = true;
@@ -5983,8 +5980,7 @@ inline void gcode_G92()
 
         current_position[i] = v;
 
-        if (i != E_AXIS) 
-        {
+        if (i != E_AXIS) {
           didXYZ = true;
           if (i == Z_AXIS) 
           {
@@ -6544,8 +6540,7 @@ inline void gcode_M17() {
   /**
    * M24: Start or Resume SD Print
    */
-  inline void gcode_M24() 
-  {
+  inline void gcode_M24() {
     #if ENABLED(SDSUPPORT) && ENABLED(POWEROFF_SAVE_SD_FILE)
       card.removePowerOffFile();
     #endif
@@ -7326,8 +7321,7 @@ inline void gcode_M77() { print_job_timer.stop(); }
 /**
  * M104: Set hot end temperature
  */
-inline void gcode_M104() 
-{
+inline void gcode_M104() {
   if (get_target_extruder_from_command(104)) return;
   if (DEBUGGING(DRYRUN)) return;
 
@@ -7335,8 +7329,7 @@ inline void gcode_M104()
     if (target_extruder != active_extruder) return;
   #endif
 
-  if (parser.seenval('S')) 
-  {
+  if (parser.seenval('S')) {
     const int16_t temp = parser.value_celsius();
     thermalManager.setTargetHotend(temp, target_extruder);
 
@@ -7352,8 +7345,7 @@ inline void gcode_M104()
        * standby mode, for instance in a dual extruder setup, without affecting
        * the running print timer.
        */
-      if (parser.value_celsius() <= (EXTRUDE_MINTEMP) / 2) 
-      {
+      if (parser.value_celsius() <= (EXTRUDE_MINTEMP) / 2) {
         print_job_timer.stop();
         LCD_MESSAGEPGM(WELCOME_MSG);
       }
@@ -7549,8 +7541,8 @@ inline void gcode_M105() {
   #define MIN_COOLING_SLOPE_TIME 60
 #endif
 
-inline void gcode_M109() 
-{
+inline void gcode_M109() {
+
   if (get_target_extruder_from_command(109)) return;
   if (DEBUGGING(DRYRUN)) return;
 
@@ -7559,8 +7551,7 @@ inline void gcode_M109()
   #endif
 
   const bool no_wait_for_cooling = parser.seenval('S');
-  if (no_wait_for_cooling || parser.seenval('R')) 
-  {
+  if (no_wait_for_cooling || parser.seenval('R')) {
     const int16_t temp = parser.value_celsius();
     thermalManager.setTargetHotend(temp, target_extruder);
 
@@ -7575,8 +7566,7 @@ inline void gcode_M109()
        * standby mode, (e.g., in a dual extruder setup) without affecting
        * the running print timer.
        */
-      if (parser.value_celsius() <= (EXTRUDE_MINTEMP) / 2) 
-      {
+      if (parser.value_celsius() <= (EXTRUDE_MINTEMP) / 2) {
         print_job_timer.stop();
         LCD_MESSAGEPGM(WELCOME_MSG);
       }
@@ -7619,11 +7609,9 @@ inline void gcode_M109()
     uint8_t old_blue = 0;
   #endif
 
-  do 
-  {
+  do {
     // Target temperature might be changed during the loop
-    if (target_temp != thermalManager.degTargetHotend(target_extruder)) 
-	{
+    if (target_temp != thermalManager.degTargetHotend(target_extruder)) {
       wants_to_cool = thermalManager.isCoolingHotend(target_extruder);
       target_temp = thermalManager.degTargetHotend(target_extruder);
 
@@ -7632,9 +7620,7 @@ inline void gcode_M109()
     }
 
     now = millis();
-    if (ELAPSED(now, next_temp_ms)) 
-	{ 
-	  // Print temp & remaining time every 1s while waiting
+    if (ELAPSED(now, next_temp_ms)) { //Print temp & remaining time every 1s while waiting
       next_temp_ms = now + 1000UL;
       print_heaterstates();
       #if TEMP_RESIDENCY_TIME > 0
@@ -7654,11 +7640,9 @@ inline void gcode_M109()
 
     #if ENABLED(PRINTER_EVENT_LEDS)
       // Gradually change LED strip from violet to red as nozzle heats up
-      if (!wants_to_cool) 
-	  {
+      if (!wants_to_cool) {
         const uint8_t blue = map(constrain(temp, start_temp, target_temp), start_temp, target_temp, 255, 0);
-        if (blue != old_blue) 
-		{
+        if (blue != old_blue) {
           old_blue = blue;
           set_led_color(255, 0, blue
           #if ENABLED(NEOPIXEL_LED)
@@ -7677,13 +7661,11 @@ inline void gcode_M109()
 
       const float temp_diff = FABS(target_temp - temp);
 
-      if (!residency_start_ms) 
-	  {
+      if (!residency_start_ms) {
         // Start the TEMP_RESIDENCY_TIME timer when we reach target temp for the first time.
         if (temp_diff < TEMP_WINDOW) residency_start_ms = now;
       }
-      else if (temp_diff > TEMP_HYSTERESIS) 
-	  {
+      else if (temp_diff > TEMP_HYSTERESIS) {
         // Restart the timer whenever the temperature falls outside the hysteresis.
         residency_start_ms = now;
       }
@@ -7691,12 +7673,10 @@ inline void gcode_M109()
     #endif
 
     // Prevent a wait-forever situation if R is misused i.e. M109 R0
-    if (wants_to_cool) 
-	{
+    if (wants_to_cool) {
       // break after MIN_COOLING_SLOPE_TIME seconds
       // if the temperature did not drop at least MIN_COOLING_SLOPE_DEG
-      if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) 
-	  {
+      if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) {
         if (old_temp - temp < MIN_COOLING_SLOPE_DEG) break;
         next_cool_check_ms = now + 1000UL * MIN_COOLING_SLOPE_TIME;
         old_temp = temp;
@@ -7705,8 +7685,7 @@ inline void gcode_M109()
 
   } while (wait_for_heatup && TEMP_CONDITIONS);
 
-  if (wait_for_heatup) 
-  {
+  if (wait_for_heatup) {
     LCD_MESSAGEPGM(MSG_HEATING_COMPLETE);
     #if ENABLED(PRINTER_EVENT_LEDS)
       #if ENABLED(RGB_LED) || ENABLED(BLINKM) || ENABLED(PCA9632) || ENABLED(RGBW_LED)
@@ -7736,14 +7715,12 @@ inline void gcode_M109()
    * M190: Sxxx Wait for bed current temp to reach target temp. Waits only when heating
    *       Rxxx Wait for bed current temp to reach target temp. Waits when heating and cooling
    */
-  inline void gcode_M190() 
-  {
+  inline void gcode_M190() {
     if (DEBUGGING(DRYRUN)) return;
 
     LCD_MESSAGEPGM(MSG_BED_HEATING);
     const bool no_wait_for_cooling = parser.seenval('S');
-    if (no_wait_for_cooling || parser.seenval('R')) 
-	{
+    if (no_wait_for_cooling || parser.seenval('R')) {
       thermalManager.setTargetBed(parser.value_celsius());
       #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
         if (parser.value_celsius() > BED_MINTEMP)
@@ -7788,9 +7765,7 @@ inline void gcode_M109()
       }
 
       now = millis();
-      if (ELAPSED(now, next_temp_ms)) 
-	  {
-	    // Print Temp Reading every 1 second while heating up.
+      if (ELAPSED(now, next_temp_ms)) { //Print Temp Reading every 1 second while heating up.
         next_temp_ms = now + 1000UL;
         print_heaterstates();
         #if TEMP_BED_RESIDENCY_TIME > 0
@@ -7810,11 +7785,9 @@ inline void gcode_M109()
 
       #if ENABLED(PRINTER_EVENT_LEDS)
         // Gradually change LED strip from blue to violet as bed heats up
-        if (!wants_to_cool) 
-		{
+        if (!wants_to_cool) {
           const uint8_t red = map(constrain(temp, start_temp, target_temp), start_temp, target_temp, 0, 255);
-          if (red != old_red) 
-		  {
+          if (red != old_red) {
             old_red = red;
             set_led_color(red, 0, 255
               #if ENABLED(NEOPIXEL_LED)
@@ -7832,13 +7805,11 @@ inline void gcode_M109()
 
         const float temp_diff = FABS(target_temp - temp);
 
-        if (!residency_start_ms) 
-		{
+        if (!residency_start_ms) {
           // Start the TEMP_BED_RESIDENCY_TIME timer when we reach target temp for the first time.
           if (temp_diff < TEMP_BED_WINDOW) residency_start_ms = now;
         }
-        else if (temp_diff > TEMP_BED_HYSTERESIS) 
-		{
+        else if (temp_diff > TEMP_BED_HYSTERESIS) {
           // Restart the timer whenever the temperature falls outside the hysteresis.
           residency_start_ms = now;
         }
@@ -7846,12 +7817,10 @@ inline void gcode_M109()
       #endif // TEMP_BED_RESIDENCY_TIME > 0
 
       // Prevent a wait-forever situation if R is misused i.e. M190 R0
-      if (wants_to_cool) 
-	  {
+      if (wants_to_cool) {
         // Break after MIN_COOLING_SLOPE_TIME_BED seconds
         // if the temperature did not drop at least MIN_COOLING_SLOPE_DEG_BED
-        if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) 
-		{
+        if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) {
           if (old_temp - temp < MIN_COOLING_SLOPE_DEG_BED) break;
           next_cool_check_ms = now + 1000UL * MIN_COOLING_SLOPE_TIME_BED;
           old_temp = temp;
@@ -13936,22 +13905,20 @@ void setup() {
  *  - Call endstop manager
  *  - Call LCD update
  */
-void loop()
-{
+void loop() {
   if (commands_in_queue < BUFSIZE) get_available_commands();
 
   #if ENABLED(SDSUPPORT)
     card.checkautostart(false);
   #endif
 
-  if (commands_in_queue)
-  {
+  if (commands_in_queue) {
+
     #if ENABLED(SDSUPPORT)
-      if (card.saving)
-      {
+
+      if (card.saving) {
         char* command = command_queue[cmd_queue_index_r];
-        if (strstr_P(command, PSTR("M29")))
-        {
+        if (strstr_P(command, PSTR("M29"))) {
           // M29 closes the file
           card.closefile();
           SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
@@ -13966,8 +13933,7 @@ void loop()
 
           ok_to_send();
         }
-        else 
-        {
+        else {
           // Write the string from the read buffer to SD
           card.write_command(command);
           if (card.logging)
@@ -13991,13 +13957,9 @@ void loop()
     #endif // SDSUPPORT
 
     // The queue may be reset by a command handler or by code invoked by idle() within a handler
-    if (commands_in_queue) 
-    {
+    if (commands_in_queue) {
       --commands_in_queue;
-      if (++cmd_queue_index_r >= BUFSIZE)
-      {
-        cmd_queue_index_r = 0;
-      }
+      if (++cmd_queue_index_r >= BUFSIZE) cmd_queue_index_r = 0;
     }
   }
   endstops.report_state();

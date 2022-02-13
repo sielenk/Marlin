@@ -291,12 +291,11 @@ void lcd_printPGM_utf(const char *str, uint8_t n=LCD_WIDTH) {
 
   #endif // SHOW_CUSTOM_BOOTSCREEN
 
-  void lcd_bootscreen() 
-  {
+  void lcd_bootscreen() {
+
     static bool show_bootscreen = true;
 
-    if (show_bootscreen) 
-    {
+    if (show_bootscreen) {
       show_bootscreen = false;
 
       #if ENABLED(START_BMPHIGH)
@@ -326,8 +325,8 @@ void lcd_printPGM_utf(const char *str, uint8_t n=LCD_WIDTH) {
 #endif // SHOW_BOOTSCREEN
 
 // Initialize or re-initialize the LCD
-static void lcd_implementation_init()
-{
+static void lcd_implementation_init() {
+
   #if PIN_EXISTS(LCD_BACKLIGHT) // Enable LCD backlight
     OUT_WRITE(LCD_BACKLIGHT_PIN, HIGH);
   #endif
@@ -479,10 +478,9 @@ inline void lcd_implementation_status_message(const bool blink) {
   #endif
 }
 
-// #define DOGM_SD_PERCENT
+//#define DOGM_SD_PERCENT
 
-static void lcd_implementation_status_screen() 
-{
+static void lcd_implementation_status_screen() {
 
   const bool blink = lcd_blink();
 
@@ -493,8 +491,8 @@ static void lcd_implementation_status_screen()
   // Fan Animation
   //
 
-  if (PAGE_UNDER(STATUS_SCREENHEIGHT + 1)) 
-  {
+  if (PAGE_UNDER(STATUS_SCREENHEIGHT + 1)) {
+
     // u8g.drawBitmapP(9, 1, STATUS_SCREENBYTEWIDTH, STATUS_SCREENHEIGHT,
     u8g.drawBitmapP(0, 1, STATUS_SCREENBYTEWIDTH, STATUS_SCREENHEIGHT,
       #if HAS_FAN0
@@ -510,8 +508,7 @@ static void lcd_implementation_status_screen()
   // Temperature Graphics and Info
   //
 
-  if (PAGE_UNDER(28)) 
-  {
+  if (PAGE_UNDER(28)) {
     // Extruders
     // HOTEND_LOOP() _draw_heater_status(5 + e * 25, e, blink);
     for(int e = 0; e < 1; e++) _draw_heater_status(38 + e * 25, e, blink);
@@ -522,12 +519,10 @@ static void lcd_implementation_status_screen()
     #endif
 
     #if HAS_FAN0
-      if (PAGE_CONTAINS(20, 27)) 
-      {
+      if (PAGE_CONTAINS(20, 27)) {
         // Fan
         const int16_t per = ((fanSpeeds[0] + 1) * 100) / 256;
-        if (per) 
-        {
+        if (per) {
           u8g.setPrintPos(104, 27);
           lcd_print(itostr3(per));
           u8g.print('%');
@@ -542,8 +537,7 @@ static void lcd_implementation_status_screen()
     // SD Card Symbol
     //
 
-    if (PAGE_CONTAINS(42 - (TALL_FONT_CORRECTION), 51 - (TALL_FONT_CORRECTION))) 
-    {
+    if (PAGE_CONTAINS(42 - (TALL_FONT_CORRECTION), 51 - (TALL_FONT_CORRECTION))) {
       // Upper box
       u8g.drawBox(42, 42 - (TALL_FONT_CORRECTION), 8, 7);     // 42-48 (or 41-47)
       // Right edge
@@ -603,8 +597,7 @@ static void lcd_implementation_status_screen()
       #define SD_DURATION_X (LCD_PIXEL_WIDTH - len * DOG_CHAR_WIDTH)
     #endif
 
-    if (PAGE_CONTAINS(41, 48)) 
-    {
+    if (PAGE_CONTAINS(41, 48)) {
 
       char buffer[10];
       duration_t elapsed = print_job_timer.duration();
@@ -666,8 +659,7 @@ static void lcd_implementation_status_screen()
   #endif
 
   // At the first page, regenerate the XYZ strings
-  if (page.page == 0) 
-  {
+  if (page.page == 0) {
     strcpy(xstring, ftostr4sign(current_position[X_AXIS]));
     strcpy(ystring, ftostr4sign(current_position[Y_AXIS]));
     strcpy(zstring, ftostr52sp(FIXFLOAT(current_position[Z_AXIS])));
@@ -716,8 +708,7 @@ static void lcd_implementation_status_screen()
   // Feedrate
   //
 
-  if (PAGE_CONTAINS(51 - INFO_FONT_HEIGHT, 49)) 
-  {
+  if (PAGE_CONTAINS(51 - INFO_FONT_HEIGHT, 49)) {
     lcd_setFont(FONT_MENU);
     u8g.setPrintPos(3, 50);
     lcd_print(LCD_STR_FEEDRATE[0]);
@@ -750,18 +741,14 @@ static void lcd_implementation_status_screen()
 
   #define STATUS_BASELINE (55 + INFO_FONT_HEIGHT)
 
-  if (PAGE_CONTAINS(STATUS_BASELINE - (INFO_FONT_HEIGHT - 1), STATUS_BASELINE)) 
-  {
+  if (PAGE_CONTAINS(STATUS_BASELINE - (INFO_FONT_HEIGHT - 1), STATUS_BASELINE)) {
     u8g.setPrintPos(0, STATUS_BASELINE);
 
     #if ENABLED(FILAMENT_LCD_DISPLAY) && ENABLED(SDSUPPORT)
-      if (PENDING(millis(), previous_lcd_status_ms + 5000UL)) 
-      {
-        //Display both Status message line and Filament display on the last line
+      if (PENDING(millis(), previous_lcd_status_ms + 5000UL)) {  //Display both Status message line and Filament display on the last line
         lcd_implementation_status_message(blink);
       }
-      else 
-      {
+      else {
         lcd_printPGM(PSTR(LCD_STR_FILAM_DIA));
         u8g.print(':');
         lcd_print(ftostr12ns(filament_width_meas));

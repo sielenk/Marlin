@@ -918,20 +918,16 @@ void CardReader::updir() {
 
 #endif // SDCARD_SORT_ALPHA
 
-void CardReader::printingHasFinished() 
-{
+void CardReader::printingHasFinished() {
   stepper.synchronize();
   file.close();
-  if (file_subcall_ctr > 0)
-  { 
-    // Heading up to a parent file that called current as a procedure.
+  if (file_subcall_ctr > 0) { // Heading up to a parent file that called current as a procedure.
     file_subcall_ctr--;
     openFile(proc_filenames[file_subcall_ctr], true, true);
     setIndex(filespos[file_subcall_ctr]);
     startFileprint();
   }
-  else
-  {
+  else {
     sdprinting = false;
     #if ENABLED(POWEROFF_SAVE_SD_FILE)
       openPowerOffFile(power_off_info.power_off_filename, O_CREAT | O_WRITE | O_TRUNC | O_SYNC);
